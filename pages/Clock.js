@@ -1,26 +1,47 @@
 import React, { useState } from 'react'
-import { Button } from 'react-native'
-import DatePicker from 'react-native-date-picker'
-
+import { Button,View,Text } from 'react-native'
+import DateTimePicker from '@react-native-community/datetimepicker';
 export default Clock =  () => {
-  const [date, setDate] = useState(new Date())
-  const [open, setOpen] = useState(false)
-    console.log(DatePicker)
+  const [date, setDate] = useState(new Date(1598051730000));
+  const [mode, setMode] = useState('date');
+  const [show, setShow] = useState(false);
+
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate;
+    setShow(false);
+    setDate(currentDate);
+  };
+
+  const showMode = (currentMode) => {
+    setShow(true);
+    setMode(currentMode);
+  };
+
+  const showDatepicker = () => {
+    showMode('date');
+  };
+
+  const showTimepicker = () => {
+    showMode('time');
+  };
   return (
-    <>
-      <Button title="Open" onPress={() => setOpen(true)} />
-      <DatePicker
-        modal
-        open={open}
-        date={date}
-        onConfirm={(date) => {
-          setOpen(false)
-          setDate(date)
-        }}
-        onCancel={() => {
-          setOpen(false)
-        }}
+    <View>
+    <View>
+      <Button onPress={showDatepicker} title="Show date picker!" />
+    </View>
+    <View>
+      <Button onPress={showTimepicker} title="Show time picker!" />
+    </View>
+    <Text>selected: {date.toLocaleString()}</Text>
+    {show && (
+      <DateTimePicker
+        testID="dateTimePicker"
+        value={date}
+        mode={mode}
+        is24Hour={true}
+        onChange={onChange}
       />
-    </>
+    )}
+  </View>
   )
 }

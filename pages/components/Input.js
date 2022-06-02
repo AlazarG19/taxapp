@@ -7,7 +7,7 @@ const Input = (props) => {
   return (
     <View style={"marginTop" in props ? [styles.formContainer,{marginTop : props.marginTop}] : styles.formContainer }>
         <Text style={styles.Title}>{props.title}</Text>
-        <TextInput  onFocus={()=>{setBW(2)}} onEndEditing = {()=>{setBW(0)}} style={[styles.Input,{borderWidth}]} placeholder={props.title} secureTextEntry = {"password" in props ? true : false}/>
+        <TextInput onChangeText={props.onChangeText}  onFocus={()=>{setBW(2)}} onEndEditing = {()=>{setBW(0)}} style={props.valid ? [styles.Input,{borderWidth}] : styles.invalidInput} placeholder={props.title} secureTextEntry = {"password" in props ? true : false}/>
       </View>
   )
 }
@@ -22,6 +22,18 @@ const styles = StyleSheet.create({
       },
       Title: {
         fontSize: 18,
+        fontFamily : "Montserrat_400Regular",
+      },
+      invalidInput:
+      {  
+        marginTop : height * 0.005,
+        height : 40,
+        fontSize: 18,
+        paddingLeft:10,
+        borderRadius : 10,
+        width : width *.8,
+        borderColor : "red",
+        borderWidth : 2,
         fontFamily : "Montserrat_400Regular",
       },
       Input : {

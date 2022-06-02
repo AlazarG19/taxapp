@@ -3,15 +3,11 @@ import { Button,View,Text } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker';
 export default Clock =  () => {
   const [date, setDate] = useState(new Date(1598051730000));
+  const [datetouched,setDatetouched] = useState(false)
   const [mode, setMode] = useState('date');
   const [show, setShow] = useState(false);
 
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate;
-    setShow(false);
-    setDate(currentDate);
-  };
-
+ 
   const showMode = (currentMode) => {
     setShow(true);
     setMode(currentMode);
@@ -32,7 +28,7 @@ export default Clock =  () => {
     <View>
       <Button onPress={showTimepicker} title="Show time picker!" />
     </View>
-    <Text>selected: {date.toLocaleString()}</Text>
+    <Text>selected: {datetouched ? date.toLocaleString() : "Please Select Date"}</Text>
     {show && (
       <DateTimePicker
         testID="dateTimePicker"
@@ -40,6 +36,7 @@ export default Clock =  () => {
         mode={mode}
         is24Hour={true}
         onChange={onChange}
+        themeVariant="dark"
       />
     )}
   </View>

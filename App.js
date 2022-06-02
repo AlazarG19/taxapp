@@ -14,7 +14,7 @@ export default function App() {
     <NavigationContainer>
       <Drawer.Navigator
         drawerContent={(props) => <CustomSideMenu {...props} />}
-        initialRouteName="Clock"
+        initialRouteName="Purchase"
       >
         <Drawer.Screen
           options={{ headerShown: true}}

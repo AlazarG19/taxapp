@@ -83,34 +83,34 @@ const Purchase = () => {
     }
   }
   // validation 
-  const [validCheck, setValidCheck] = useState(true)
-  const [validItemId, setValidItemId] = useState(true)
-  const [validation, setValidation] = useState(true)
-  const [validationMessage, setValidationMessage] = useState('')
-  const validate = () => {
+  // const [validCheck, setValidCheck] = useState(true)
+  // const [validItemId, setValidItemId] = useState(true)
+  // const [validation, setValidation] = useState(true)
+  // const [validationMessage, setValidationMessage] = useState('')
+  // const validate = () => {
 
-    if (checkValue === '') {
-      setValidCheck(false)
-      Alert.alert("Please fill all the fields","Please fill in check number",[
-        {text:"OK",onPress:()=>{
-        }}
-      ])
-    } 
-    if( itemid === "" ){
-      Alert.alert("Please fill all the fields","Please fill in the item id",[
-        {text:"OK",onPress:()=>{
-        }}
-      ])
-    }
-    else {
-      setValidation(true)
-      setValidationMessage('')
-    }
-    if(!validation){
-      console.log("this is validation message",validationMessage)
+  //   if (checkValue === '') {
+  //     setValidCheck(false)
+  //     Alert.alert("Please fill all the fields","Please fill in check number",[
+  //       {text:"OK",onPress:()=>{
+  //       }}
+  //     ])
+  //   } 
+  //   if( itemid === "" ){
+  //     Alert.alert("Please fill all the fields","Please fill in the item id",[
+  //       {text:"OK",onPress:()=>{
+  //       }}
+  //     ])
+  //   }
+  //   else {
+  //     setValidation(true)
+  //     setValidationMessage('')
+  //   }
+  //   if(!validation){
+  //     console.log("this is validation message",validationMessage)
       
-    }
-  }
+  //   }
+  // }
 
 
   // end of validation 
@@ -182,8 +182,9 @@ const Purchase = () => {
             </TouchableOpacity>
           </View>
         </View>
-        <Input value = {checkValue} onChangeText = {onCheckChange} valid = {validCheck} title="Check No" marginTop={height * 0.03} />
-        <Input value = {itemid} onChange = {onItemIdChange} valid = {validItemId} title="Item Id" marginTop={height * 0.03} />
+        <Input onChangeText = {onCheckChange} title="Check No" marginTop={height * 0.03} />
+
+        <Input onChange = {onItemIdChange} title="Item Id" marginTop={height * 0.03} />
         <View
           style={{
             flexDirection: 'row',
@@ -219,7 +220,7 @@ const Purchase = () => {
         </RadioButtonGroup>
         <View style={styles.taxTxtContainer}>
           <Text style={styles.taxTxt}>
-            Tax : {taxType ? taxValue : 'false'}
+            Tax : {taxType ? taxValue : 'None '}
           </Text>
         </View>
         <View
@@ -257,7 +258,6 @@ const Purchase = () => {
           }}
         >
           <TouchableOpacity 
-          onPress = {validate}
           style={styles.purchaseBtn}>
             <Text style={styles.purchasebtnTxt}>Purchase</Text>
           </TouchableOpacity>

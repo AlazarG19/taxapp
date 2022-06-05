@@ -7,7 +7,7 @@ const Input = (props) => {
   return (
     <View style={"marginTop" in props ? [styles.formContainer,{marginTop : props.marginTop}] : styles.formContainer }>
         <Text style={styles.Title}>{props.title}</Text>
-        <TextInput onChangeText={props.onChangeText}  onFocus={()=>{setBW(2)}} onEndEditing = {()=>{setBW(0)}} style={props.valid ? [styles.Input,{borderWidth}] : styles.invalidInput} placeholder={props.title} secureTextEntry = {"password" in props ? true : false}/>
+        <TextInput onChangeText={props.onChangeText}  onFocus={()=>{setBW(2)}} onEndEditing = {()=>{setBW(0)}} style={[styles.Input,{borderWidth}] } placeholder={props.title} secureTextEntry = {"password" in props ? true : false}/>
       </View>
   )
 }

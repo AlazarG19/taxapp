@@ -100,12 +100,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     flex: 0.2,
     flexDirection: 'row',
-    backgroundColor: 'wheat',
+    backgroundColor: '#1A334D',
   },
   brand: {
     paddingTop: 25,
     fontSize: 35,
     paddingLeft: 15,
+    color : "#F5F6F8"
   },
   containerPart2: {
     flex: 0.65,

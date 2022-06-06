@@ -5,8 +5,11 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
-  Alert
+  Alert,
+  SafeAreaView,
+  ScrollView,
 } from 'react-native'
+import { Formik } from 'formik'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import React, { useState } from 'react'
 import MenuBar from '../Icons/menu.png'
@@ -19,15 +22,24 @@ import Input from './components/Input'
 import HalfInput from './components/HalfInput'
 import RadioButtonGroup, { RadioButtonItem } from 'expo-radio-button'
 const { width, height } = Dimensions.get('window')
-const Purchase = () => {
-  const [taxType, setTaxType] = useState('')
+import * as yup from 'yup'
+const validationScheme = yup.object().shape({
+  checkNo: yup.string().required().label('Check No'),
+  itemId: yup.string().required().label('Item id'),
+  quantity: yup.string().required().label('Quantity'),
+})
+const Purchase = (props) => {
+  const [taxType, setTaxType] = useState('exempt')
   const [taxValue, setTaxValue] = useState('')
+  const [paymentType, setPaymentType] = useState('cash')
   const [price, setPrice] = useState('')
   const [total, setTotal] = useState('')
-  const [checkValue ,setCheckValue] = useState('')
-  const [itemid,setItemid] = useState('')
-  const [quantity,setQuantity] = useState('')
-  // function to change text 
+
+  // validation
+  const [priceMessage, setPriceMessage] = useState('')
+  const [dateMessage, setDateMessage] = useState('')
+
+  // function to change text
   const onCheckChange = (value) => {
     setCheckValue(value)
   }
@@ -40,15 +52,15 @@ const Purchase = () => {
   // end of function to change text
   // date states
 
-  const [date, setDate] = useState(new Date())
+  const [date, setDate] = useState("Please select a date")
   const [datetouched, setDatetouched] = useState(false)
   const [show, setShow] = useState(false)
   // end of date states
 
   // date  functions
-
+console.log("the date",date)
   const onChange = (event, selectedDate) => {
-    setDatetouched(true)
+    // setDatetouched(true)
     const currentDate = selectedDate
     setShow(false)
     setDate(currentDate)
@@ -58,6 +70,7 @@ const Purchase = () => {
   }
   // end of date functions
   const priceOnChange = (value) => {
+    setPriceMessage('')
     if (value === '') {
       console.log('nothing to change')
       setPrice('')
@@ -77,45 +90,14 @@ const Purchase = () => {
           setTaxValue(intPrice * 0.02)
           setTotal(`${finalprice}`)
           break
+        case 'exempt':
+          setTaxValue(0)
         default:
           setTotal(value)
       }
     }
   }
-  // validation 
-  // const [validCheck, setValidCheck] = useState(true)
-  // const [validItemId, setValidItemId] = useState(true)
-  // const [validation, setValidation] = useState(true)
-  // const [validationMessage, setValidationMessage] = useState('')
-  // const validate = () => {
-
-  //   if (checkValue === '') {
-  //     setValidCheck(false)
-  //     Alert.alert("Please fill all the fields","Please fill in check number",[
-  //       {text:"OK",onPress:()=>{
-  //       }}
-  //     ])
-  //   } 
-  //   if( itemid === "" ){
-  //     Alert.alert("Please fill all the fields","Please fill in the item id",[
-  //       {text:"OK",onPress:()=>{
-  //       }}
-  //     ])
-  //   }
-  //   else {
-  //     setValidation(true)
-  //     setValidationMessage('')
-  //   }
-  //   if(!validation){
-  //     console.log("this is validation message",validationMessage)
-      
-  //   }
-  // }
-
-
-  // end of validation 
   const vatOnSelect = (value) => {
-    console.log('vat type')
     setTaxType(value)
     let intPrice = parseInt(price)
     if (price === '' || total === '') {
@@ -134,13 +116,15 @@ const Purchase = () => {
           setTaxValue(intPrice * 0.02)
           setTotal(`${finalprice}`)
           break
+        case 'exempt':
+          setTaxValue(0)
         default:
           setTotal(price)
       }
     }
   }
-  const cashOnSelect = () => {
-    console.log('pressed')
+  const cashOnSelect = (value) => {
+    setPaymentType(value)
   }
   let [fontsLoaded] = useFonts({
     Montserrat_400Regular,
@@ -150,7 +134,9 @@ const Purchase = () => {
     return <View />
   }
   return (
-    <View style={styles.container}>
+    <SafeAreaView>
+      
+      <ScrollView style = {styles.scrollview}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => {
@@ -163,117 +149,172 @@ const Purchase = () => {
           <Text style={styles.headerTxt}>Purchase</Text>
         </View>
       </View>
-      <View style={styles.purchaseForm}>
-        <View style={styles.dateContainer}>
-          <View style={styles.dateTxtContainer}>
-            <Text style={styles.dateTxt}>
-              Date :
-              {datetouched
-                ? date.toLocaleString().substring(0, 10) +
-                  ' ' +
-                  date.toLocaleString().substring(20, 24)
-                : 'Please Select Date'}
-            </Text>
-          </View>
-          <View style={styles.dateInputContainer}></View>
-          <View>
-            <TouchableOpacity onPress={showMode} style={styles.chooseDateBtn}>
-              <Text style={styles.btnTxt}>Choose Date</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <Input onChangeText = {onCheckChange} title="Check No" marginTop={height * 0.03} />
+        <View style={styles.container}>
+          <Formik
+            initialValues={{ checkNo: '', itemId: '', quantity: '' }}
+            onSubmit={(values) => {
+              if (price === '') {
+                setPriceMessage('Please enter price')
+              } 
+              else if(date === 'Please select a date'){
+                setDateMessage('Please Enter a date')}
+              else {
+                alert('submitted')
+                values['price'] = price
+                values['total'] = total
+                values['taxType'] = taxType
+                values['taxValue'] = taxValue
+                values['paymentType'] = paymentType
+                values['date'] = date
+                }
+                console.log(values)
+            }}
+            validationSchema={validationScheme}
+          >
+            {(formikProps) => (
+              <View style={styles.purchaseForm}>
+                <View style={styles.dateContainer}>
+                  <View style={styles.dateTxtContainer}>
+                    <Text style={styles.dateTxt}>
+                      Date :
+                      {date == "Please select a date"?
+                          'Please Select Date':
+                           date.toLocaleString().substring(0, 10) +
+                            ' ' +
+                            date.toLocaleString().substring(20, 24)}
+                    </Text>
 
-        <Input onChange = {onItemIdChange} title="Item Id" marginTop={height * 0.03} />
-        <View
-          style={{
-            flexDirection: 'row',
-          }}
-        >
-          <HalfInput value={price} onChangeText={priceOnChange} title="Price" />
-          <HalfInput
-            value={total}
-            onChangeText={(value) => {
-              setTotal(value)
-            }}
-            title="Total"
-          />
+                    <Text style={styles.errorMessgeDate}>{dateMessage}</Text>
+                  </View>
+                  <View>
+                    <TouchableOpacity
+                      onPress={showMode}
+                      style={styles.chooseDateBtn}
+                    >
+                      <Text style={styles.btnTxt}>Choose Date</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <Input
+                  onBlur={formikProps.handleBlur('checkNo')}
+                  onChangeText={formikProps.handleChange('checkNo')}
+                  title="Check No"
+                  marginTop={height * 0.03}
+                />
+                <Text style={styles.errorMessge1}>
+                  {formikProps.touched.checkNo && formikProps.errors.checkNo}
+                </Text>
+                <Input
+                  onBlur={formikProps.handleBlur('itemId')}
+                  onChangeText={formikProps.handleChange('itemId')}
+                  title="Item Id"
+                />
+                <Text style={styles.errorMessge1}>
+                  {formikProps.touched.itemId && formikProps.errors.itemId}
+                </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                  }}
+                >
+                  <HalfInput
+                    value={price}
+                    onChangeText={priceOnChange}
+                    title="Price"
+                  />
+
+                  <HalfInput
+                    value={total}
+                    onChangeText={(value) => {
+                      setTotal(value)
+                    }}
+                    title="Total"
+                  />
+                </View>
+                <Text style={styles.errorMessge1}>{priceMessage}</Text>
+                <RadioButtonGroup
+                  containerStyle={styles.radioButtonGroup}
+                  selected={taxType}
+                  onSelected={vatOnSelect}
+                  radioBackground="#004C99"
+                >
+                  <RadioButtonItem
+                    value="vat"
+                    label={<Text style={styles.radioBtnLabel}>VAT 15%</Text>}
+                  />
+                  <RadioButtonItem
+                    value="tot"
+                    label={<Text style={styles.radioBtnLabel}>TOT 2%</Text>}
+                  />
+                  <RadioButtonItem
+                    value="exempt"
+                    label={<Text style={styles.radioBtnLabel}>EXEMPT</Text>}
+                  />
+                </RadioButtonGroup>
+                <View style={styles.taxTxtContainer}>
+                  <Text style={styles.taxTxt}>
+                    Tax : {taxType != 'exempt' ? taxValue : '0'}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    width: '100%',
+                  }}
+                >
+                  <HalfInput
+                    onBlur={formikProps.handleBlur('quantity')}
+                    onChangeText={formikProps.handleChange('quantity')}
+                    title="Quantity"
+                  />
+                  <Text style={styles.errorMessge1}>
+                    {formikProps.touched.quantity &&
+                      formikProps.errors.quantity}
+                  </Text>
+                </View>
+                <RadioButtonGroup
+                  containerStyle={styles.radioButtonGroup}
+                  selected={paymentType}
+                  onSelected={cashOnSelect}
+                  radioBackground="#004C99"
+                >
+                  <RadioButtonItem
+                    value="cash"
+                    label={<Text style={styles.radioBtnLabel}>Cash</Text>}
+                  />
+                  <RadioButtonItem
+                    value="credit"
+                    label={<Text style={styles.radioBtnLabel}>Credit</Text>}
+                  />
+                </RadioButtonGroup>
+                <View
+                  style={{
+                    width: '100%',
+                    alignItems: 'center',
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={formikProps.handleSubmit}
+                    style={styles.purchaseBtn}
+                  >
+                    <Text style={styles.purchasebtnTxt}>Purchase</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </Formik>
+          {show && (
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={date == "Please select a date" ? new Date() : date}
+              mode="date"
+              is24Hour={true}
+              onChange={onChange}
+              themeVariant="dark"
+            />
+          )}
         </View>
-        <RadioButtonGroup
-          containerStyle={styles.radioButtonGroup}
-          selected={taxType}
-          onSelected={vatOnSelect}
-          radioBackground="blue"
-        >
-          <RadioButtonItem
-            value="vat"
-            label={<Text style={styles.radioBtnLabel}>VAT 15%</Text>}
-          />
-          <RadioButtonItem
-            value="tot"
-            label={<Text style={styles.radioBtnLabel}>TOT 2%</Text>}
-          />
-          <RadioButtonItem
-            value="exempt"
-            label={<Text style={styles.radioBtnLabel}>EXEMPT</Text>}
-          />
-        </RadioButtonGroup>
-        <View style={styles.taxTxtContainer}>
-          <Text style={styles.taxTxt}>
-            Tax : {taxType ? taxValue : 'None '}
-          </Text>
-        </View>
-        <View
-          style={{
-            width: '100%',
-          }}
-        >
-          <HalfInput
-            value={''}
-            onChangeText={(value) => {
-              console.log('hello')
-            }}
-            title="Quantity"
-          />
-        </View>
-        <RadioButtonGroup
-          containerStyle={styles.radioButtonGroup}
-          selected={taxType}
-          onSelected={cashOnSelect}
-          radioBackground="green"
-        >
-          <RadioButtonItem
-            value="cash"
-            label={<Text style={styles.radioBtnLabel}>Cash</Text>}
-          />
-          <RadioButtonItem
-            value="credit"
-            label={<Text style={styles.radioBtnLabel}>Credit</Text>}
-          />
-        </RadioButtonGroup>
-        <View
-          style={{
-            width: '100%',
-            alignItems: 'center',
-          }}
-        >
-          <TouchableOpacity 
-          style={styles.purchaseBtn}>
-            <Text style={styles.purchasebtnTxt}>Purchase</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      {show && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={date}
-          mode="date"
-          is24Hour={true}
-          onChange={onChange}
-          themeVariant="dark"
-        />
-      )}
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 
@@ -281,20 +322,26 @@ export default Purchase
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginTop: height * 0.1,
+  flex : 1,
+  },
+  scrollview:{
+  // backgroundColor : "red", 
   },
   header: {
     flexDirection: 'row',
-    marginLeft: 20,
-    height: height * 0.05,
+    paddingLeft: 20,
+    paddingTop : height*0.04,
+    height: height * 0.13,
     alignItems: 'center',
+    backgroundColor: '#1A334D',
   },
   headerTxt: {
     fontSize: 30,
     justifyContent: 'center',
+    color : "#F5F6F8"
   },
   headerTxtContainer: {
+    
     marginLeft: width * 0.25,
   },
   menuBar: {
@@ -302,6 +349,7 @@ const styles = StyleSheet.create({
     height: 25,
   },
   purchaseForm: {
+    backgroundColor : "#E0E3E9",
     flex: 1,
     paddingTop: height * 0.02,
   },
@@ -310,7 +358,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: width * 0.4,
     // overflow: 'hidden',
-    backgroundColor: 'blue',
+    marginTop : height * 0.02,
+    backgroundColor: '#004C99',
     borderRadius: 15,
     height: 45,
   },
@@ -341,7 +390,7 @@ const styles = StyleSheet.create({
   dateContainer: {
     width: width,
     flexDirection: 'column',
-    // backgroundColor : "blue",
+    // backgroundColor : "#004C99",
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -352,6 +401,7 @@ const styles = StyleSheet.create({
   },
   radioBtnLabel: {
     fontSize: 20,
+    fontFamily: 'Montserrat_400Regular',                
     color: 'black',
   },
   purchaseBtn: {
@@ -359,14 +409,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: width * 0.5,
     // overflow: 'hidden',
-    backgroundColor: 'blue',
+    backgroundColor: '#004C99',
     borderRadius: 15,
     height: 55,
     marginTop: height * 0.05,
+    marginBottom: height * 0.1,
   },
   purchasebtnTxt: {
     fontFamily: 'Montserrat_400Regular',
     fontSize: 25,
     color: 'white',
+  },
+  errorMessge1: {
+    color: 'red',
+    fontSize: 18,
+    marginLeft: width * 0.05,
+  },
+  errorMessgeDate: {
+    color: 'red',
+    fontSize: 18,
+    marginLeft: width * 0.2,
   },
 })

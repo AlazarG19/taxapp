@@ -5,6 +5,7 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
+  TouchableWithoutFeedback
 } from 'react-native'
 import React, { useState } from 'react'
 import profiePic from '../../Images/Photo.png'
@@ -13,13 +14,13 @@ import purchase from '../../Icons/purchase.png'
 import salesReport from '../../Icons/salesReport.png'
 import purchaseReport from '../../Icons/purchaseReport.png'
 // import Home  from '../../Icons/index'
-const CustomSideMenu = () => {
+const CustomSideMenu = (props) => {
   const sideList = [
     // { icon: Home, title: 'Home', keys: 1 },
-    { icon: sales, title: 'Sales', keys: 2 },
-    { icon: purchase, title: 'Purchase', keys: 3 },
-    { icon: salesReport, title: 'Sales Report', keys: 4 },
-    { icon: purchaseReport, title: 'Purchase Report', keys: 5 },
+    { icon: sales, title: 'Sales', keys: 2 ,link:'/sales'},
+    { icon: purchase, title: 'Purchase', keys: 3 ,link:'Purchase' },
+    { icon: salesReport, title: 'Sales Report', keys: 4 ,link:'/salesReport' },
+    { icon: purchaseReport, title: 'Purchase Report', keys: 5 , link:'/purchaseReport' },
   ]
   const sideList2 = [
     // { icon: Home, title: 'Home', keys: 1 },
@@ -47,7 +48,7 @@ const CustomSideMenu = () => {
     console.log(item.title ,backgroundColor)
     return (
       <Item
-        onPress={() => {setSelectedId(item.keys)}}
+        onPress={() => {setSelectedId(item.keys);props.navigation.navigate(`${item.link}`)}}
         title={item.title}
         icon = {item.icon}
         backgroundColor={backgroundColor}
@@ -56,11 +57,13 @@ const CustomSideMenu = () => {
     )
   }
   return (
-    <View style={styles.container}>
-      <View style={styles.containerPart1}>
+    <View style={styles.container} >
+      <TouchableWithoutFeedback  onPress = {()=>{setSelectedId(null);props.navigation.navigate("Home")}} >
+        <View style={styles.containerPart1}>
         <Image source={profiePic} style={styles.logo} />
         <Text style={styles.brand}>Brand</Text>
-      </View>
+        </View>
+      </TouchableWithoutFeedback>
       <View style={styles.containerPart2}>
         <FlatList
           data={sideList}
@@ -75,7 +78,6 @@ const CustomSideMenu = () => {
             return (
               <View style={styles.sideitem}>
                 <Image source={item.item.icon} style={styles.icon} />
-                {/* <Home  /> */}
                 <View style={styles.iconTxtContainer}>
                   <Text style={styles.iconTxt}>{item.item.title}</Text>
                 </View>

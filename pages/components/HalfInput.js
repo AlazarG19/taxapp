@@ -7,7 +7,7 @@ const HalfInput = (props) => {
   return (
     <View style={styles.formContainer}>
         <Text style={styles.Title}>{props.title}</Text>
-        <TextInput value= {props.value}  onChangeText={props.onChangeText} onFocus={()=>{setBC("#add8e6")}} onEndEditing = {()=>{setBC("gray")}} style={[styles.Input,{borderColor}]} placeholder={props.title} secureTextEntry = {"password" in props ? true : false}/>
+        <TextInput keyboardType = 'numeric' value= {props.value}  onChangeText={props.onChangeText} onFocus={()=>{setBC("#add8e6")}} onEndEditing = {()=>{setBC("gray")}} style={[styles.Input,{borderColor}]} placeholder={props.title} secureTextEntry = {"password" in props ? true : false}/>
       </View>
   )
 }

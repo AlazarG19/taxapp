@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   },
   menuBar: {
     width: 25,
-    height: 25,
+    height: 25
   },
   image: {
     flex: 1,
